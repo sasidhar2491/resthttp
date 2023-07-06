@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"time"
 
 	"rest/resthttp"
 )
 
 func main() {
 	// Create a new instance of RestHttp
-	client := resthttp.NewRestHttp("https://jsonplaceholder.typicode.com", "", "", true, false, 10*time.Second)
+	client := resthttp.NewRestHttp("https://jsonplaceholder.typicode.com")
 
 	// Perform a GET request
 	container := "posts"
