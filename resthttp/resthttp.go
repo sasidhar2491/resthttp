@@ -78,7 +78,15 @@ type RestHttp struct {
 	Timeout     time.Duration
 }
 
-func NewRestHttp(baseURL string, user string, password string, sslVerify bool, debugPrint bool, timeout time.Duration) *RestHttp {
+func NewRestHttp(baseURL string, options ...func(*RestHttp)) *RestHttp {
+	// Set default values for optional arguments
+	user := ""
+	password := ""
+	sslVerify := true
+	debugPrint := false
+	timeout := 10 * time.Second
+
+	// Trim trailing slash from the base URL
 	baseURL = strings.TrimRight(baseURL, "/")
 
 	headers := make(http.Header)
@@ -90,7 +98,8 @@ func NewRestHttp(baseURL string, user string, password string, sslVerify bool, d
 		headers.Set("Authorization", authHeader)
 	}
 
-	return &RestHttp{
+	// Create a new RestHttp instance
+	restHttp := &RestHttp{
 		BaseURL:     baseURL,
 		BaseHeaders: headers,
 		User:        user,
@@ -99,6 +108,13 @@ func NewRestHttp(baseURL string, user string, password string, sslVerify bool, d
 		DebugPrint:  debugPrint,
 		Timeout:     timeout,
 	}
+
+	// Apply optional arguments
+	for _, option := range options {
+		option(restHttp)
+	}
+
+	return restHttp
 }
 
 func (r *RestHttp) MakeURL(container string, resource string, queryItems url.Values) string {
@@ -176,6 +192,7 @@ func (r *RestHttp) GetRequest(container string, resource string, queryItems url.
 
 	return body, nil
 }
+
 func (r *RestHttp) setHeaders(req *http.Request) {
 	for key, values := range r.BaseHeaders {
 		for _, value := range values {
