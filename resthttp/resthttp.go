@@ -116,6 +116,23 @@ func NewRestHttp(baseURL string, options ...func(*RestHttp)) *RestHttp {
 
 	return restHttp
 }
+func WithUser(user string) func(*RestHttp) {
+	return func(r *RestHttp) {
+		r.User = user
+	}
+}
+
+func WithPassword(password string) func(*RestHttp) {
+	return func(r *RestHttp) {
+		r.Password = password
+	}
+}
+
+func WithDebugPrint(debugPrint bool) func(*RestHttp) {
+	return func(r *RestHttp) {
+		r.DebugPrint = debugPrint
+	}
+}
 
 func (r *RestHttp) MakeURL(container string, resource string, queryItems url.Values) string {
 	parts := []string{r.BaseURL}
