@@ -10,7 +10,7 @@ import (
 
 func main() {
 	// Create a new instance of RestHttp
-	client := resthttp.NewRestHttp("https://jsonplaceholder.typicode.com")
+	client := resthttp.NewRestHttp("https://jsonplaceholder.typicode.com", resthttp.WithUser("User"), resthttp.WithPassword("Password"))
 
 	// Perform a GET request
 	container := "posts"

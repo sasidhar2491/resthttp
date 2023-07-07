@@ -79,46 +79,38 @@ type RestHttp struct {
 }
 
 func NewRestHttp(baseURL string, options ...func(*RestHttp)) *RestHttp {
-	// Set default values for optional arguments
-	user := ""
-	password := ""
-	sslVerify := true
-	debugPrint := false
-	timeout := 10 * time.Second
-
-	// Trim trailing slash from the base URL
-	baseURL = strings.TrimRight(baseURL, "/")
-
-	headers := make(http.Header)
-	headers.Set("Accept", "application/json")
-
-	if user != "" && password != "" {
-		auth := user + ":" + password
-		authHeader := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
-		headers.Set("Authorization", authHeader)
-	}
-
-	// Create a new RestHttp instance
+	// // Set default values for optional arguments
 	restHttp := &RestHttp{
-		BaseURL:     baseURL,
-		BaseHeaders: headers,
-		User:        user,
-		Password:    password,
-		VerifySSL:   sslVerify,
-		DebugPrint:  debugPrint,
-		Timeout:     timeout,
+		BaseURL:    baseURL,
+		User:       "",
+		Password:   "",
+		VerifySSL:  true,
+		DebugPrint: false,
+		Timeout:    10 * time.Second,
 	}
+	fmt.Println("default user:", restHttp.User)
 
 	// Apply optional arguments
 	for _, option := range options {
 		option(restHttp)
 	}
-
+	fmt.Println("withUser value:", restHttp.User)
+	user := restHttp.User
+	password := restHttp.Password
+	headers := make(http.Header)
+	headers.Set("Accept", "application/json")
+	if user != "" && password != "" {
+		auth := user + ":" + password
+		authHeader := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
+		headers.Set("Authorization", authHeader)
+	}
 	return restHttp
 }
+
 func WithUser(user string) func(*RestHttp) {
 	return func(r *RestHttp) {
 		r.User = user
+		fmt.Println("user in WithUser:", user)
 	}
 }
 
@@ -244,8 +236,6 @@ func (r *RestHttp) printRequest(method string, url string, headers http.Header, 
 	}
 	fmt.Println("Body:", string(body))
 }
-
-// ...
 
 func (r *RestHttp) PostRequest(container string, resource string, params url.Values, accept string) ([]byte, error) {
 	url := r.MakeURL(container, resource, nil)
